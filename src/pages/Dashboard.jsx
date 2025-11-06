@@ -2,73 +2,70 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import StatCard from "../components/StatCard";
 import JobCard from "../components/JobCard";
-import ApplicationTable from "../components/ApplicationTable";
 
-export default function Dashboard() {
-  const [user, setUser] = useState({ name: "", avatar: "/default-avatar.png" });
+const Dashboard = () => {
+  const [user, setUser] = useState(null);
   const [stats, setStats] = useState([]);
-  const [recommendedJobs, setRecommendedJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
-
-  const token = localStorage.getItem("token"); // JWT from login
+  const [jobs, setJobs] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
 
-    const fetchDashboardData = async () => {
+    const fetchDashboard = async () => {
       try {
-        const [statsRes, jobsRes, appsRes] = await Promise.all([
-          axios.get("https://workbridge-backend-api.onrender.com/api/dashboard/stats", {
+        const [statsRes, jobsRes] = await Promise.all([
+          axios.get("/api/dashboard/stats", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("https://workbridge-backend-api.onrender.com/api/jobs/recommended", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get("https://workbridge-backend-api.onrender.com/api/applications", {
+          axios.get("/api/dashboard/jobs/recommended", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-
         setStats(statsRes.data);
-        setRecommendedJobs(jobsRes.data);
-        setApplications(appsRes.data);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        setJobs(jobsRes.data);
+      } catch (err) {
+        console.error(err);
       }
     };
-
-    fetchDashboardData();
+    fetchDashboard();
   }, [token]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1">
-        <Header user={user} />
-        <main className="p-6 space-y-6">
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {stats.map((s, i) => <StatCard key={i} {...s} />)}
-          </div>
-
-          {/* Recommended Jobs */}
-          <section>
-            <h2 className="text-xl font-bold mb-4">Recommended Jobs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recommendedJobs.map((job, i) => <JobCard key={i} job={job} />)}
+    <div className="flex min-h-screen flex-col bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+      <Header user={user} />
+      <div className="flex flex-1">
+        <Sidebar user={user} stats={stats} />
+        <main className="flex-1 p-4 md:p-8">
+          <div className="mx-auto max-w-5xl flex flex-col gap-8">
+            <div>
+              <p className="text-3xl font-black">
+                Welcome back, {user?.name || "User"}!
+              </p>
+              <p className="mt-2 text-base text-text-secondary-light dark:text-text-secondary-dark">
+                Here's your daily job search summary and recommendations.
+              </p>
             </div>
-          </section>
-
-          {/* Applications */}
-          <section>
-            <h2 className="text-xl font-bold mb-4">Your Applications</h2>
-            <ApplicationTable applications={applications} />
-          </section>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+              {stats.map((s) => (
+                <div key={s.title} className="rounded-lg bg-surface-light dark:bg-surface-dark p-4 shadow-sm">
+                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">{s.title}</p>
+                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col gap-4">
+              {jobs.map((job) => (
+                <JobCard key={job._id} job={job} />
+              ))}
+            </div>
+          </div>
         </main>
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;
