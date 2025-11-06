@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -9,32 +10,43 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     role: "job-seeker",
-    resume: null, // For Job Seeker
-    companyLogo: null, // For Employer
+    resume: null,
+    companyLogo: null,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (files) {
-      setForm({ ...form, [name]: files[0] });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    if (files) setForm({ ...form, [name]: files[0] });
+    else setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: call backend API to register user
-    console.log("Registering:", form);
+    setLoading(true);
+    setError("");
 
-    // Simulate success
-    navigate("/login"); // redirect to login after registration
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await registerUser(form);
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-lg p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-100 to-green-200">
+      <div className="w-full max-w-lg p-8 bg-white rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold text-center mb-6 text-green-700">Register</h1>
+        {error && <p className="text-red-500 text-center mb-2">{error}</p>}
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -83,35 +95,44 @@ export default function Register() {
           </select>
 
           {form.role === "job-seeker" && (
-            <input
-              type="file"
-              name="resume"
-              accept=".pdf,.doc,.docx"
-              onChange={handleChange}
-              className="w-full mb-4"
-              required
-            />
+            <label className="block mb-4 cursor-pointer bg-gray-100 p-3 rounded text-center">
+              Upload Resume
+              <input
+                type="file"
+                name="resume"
+                accept=".pdf,.doc,.docx"
+                onChange={handleChange}
+                className="hidden"
+                required
+              />
+            </label>
           )}
 
           {form.role === "employer" && (
-            <input
-              type="file"
-              name="companyLogo"
-              accept="image/*"
-              onChange={handleChange}
-              className="w-full mb-4"
-              required
-            />
+            <label className="block mb-4 cursor-pointer bg-gray-100 p-3 rounded text-center">
+              Upload Company Logo
+              <input
+                type="file"
+                name="companyLogo"
+                accept="image/*"
+                onChange={handleChange}
+                className="hidden"
+                required
+              />
+            </label>
           )}
 
-          <button className="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition">
-            Register
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700 transition"
+            disabled={loading}
+          >
+            {loading ? "Registering..." : "Register"}
           </button>
+
           <p className="text-center mt-4 text-sm">
             Already have an account?{" "}
-            <a href="/login" className="text-blue-500">
-              Login
-            </a>
+            <a href="/login" className="text-green-600 font-semibold">Login</a>
           </p>
         </form>
       </div>
