@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://workbridge-backend-api.onrender.com/"; // Replace with your backend
+const API_URL = "https://workbridge-backend-api.onrender.com/API/auth"; // Replace with your backend
 
 export const registerUser = async (data) => {
   try {
