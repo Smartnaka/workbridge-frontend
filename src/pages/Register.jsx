@@ -9,7 +9,7 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "job-seeker",
+    role: "seeker",
     resume: null,
     companyLogo: null,
   });
