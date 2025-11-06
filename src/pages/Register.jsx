@@ -10,8 +10,6 @@ export default function Register() {
     password: "",
     confirmPassword: "",
     role: "seeker",
-    resume: null,
-    companyLogo: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
