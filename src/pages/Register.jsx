@@ -90,7 +90,7 @@ export default function Register() {
             onChange={handleChange}
             className="w-full p-3 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <option value="job-seeker">Job Seeker</option>
+            <option value="seeker">Job Seeker</option>
             <option value="employer">Employer</option>
           </select>
 
