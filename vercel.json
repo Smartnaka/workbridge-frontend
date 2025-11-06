@@ -1,0 +1,6 @@
+// Client/vercel.json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
