@@ -5,13 +5,6 @@ import Dashboard from "../pages/Dashboard";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 
-
-// Simple protected route wrapper
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("token"); // check if user is logged in
-  return token ? children : <Navigate to="/login" replace />;
-};
-
 export default function AppRoutes() {
   return (
     <Router>
