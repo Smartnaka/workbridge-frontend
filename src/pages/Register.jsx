@@ -94,20 +94,6 @@ export default function Register() {
             <option value="employer">Employer</option>
           </select>
 
-          {form.role === "job-seeker" && (
-            <label className="block mb-4 cursor-pointer bg-gray-100 p-3 rounded text-center">
-              Upload Resume
-              <input
-                type="file"
-                name="resume"
-                accept=".pdf,.doc,.docx"
-                onChange={handleChange}
-                className="hidden"
-                required
-              />
-            </label>
-          )}
-
           {form.role === "employer" && (
             <label className="block mb-4 cursor-pointer bg-gray-100 p-3 rounded text-center">
               Upload Company Logo
